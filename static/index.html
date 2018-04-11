@@ -1,0 +1,130 @@
+<html>
+<head>
+    <title>Pacman</title>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type ="text/javascript">
+         $(document). ready(function (){
+            // this triggers the connection event in our server!
+            var socket  = io.connect();
+            $( 'button').click(function (){
+                socket.emit( "button_clicked", {reason:  "because I want to learn about sockets!"});
+            });
+            socket.on( 'server_response', function (data){
+                console.log( 'The server says: '  + data.response);
+            });
+        })
+    </script>
+
+    <style type="text/css">
+        body{
+            background-color: black;
+            margin: 0px;
+        }
+        div.row div{
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            margin: 0px;
+        }
+        div.brick{
+            background-color: blue;
+        }
+        div.empty{
+        }
+        div#pacman{
+            background: url('pacman.gif');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            width: 20px;
+            height: 20px;
+            position: absolute;
+        }
+        div.dot{
+            background: url('pacman_dot.gif');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+    
+    </style>
+</head>
+<body>
+    <div id='container'>
+
+        <div id='world'></div>
+        <div id='pacman'></div>
+
+        <br><button> I AM A BUTTON!</button>
+    </div>
+
+    <script>
+    var world = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
+        [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
+        [1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1],
+        [1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1],
+        [1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
+        [1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    ];
+    var pacman = {
+        x:1,
+        y:1
+    };
+
+    function displayWorld(){
+        var output = '';
+
+        for(var i = 0; i < world.length; i++){
+            output += "\n<div class='row'>\n";
+            for(var j=0; j< world[i].length; j++){
+                if(world[i][j] == 1)
+                    output += "<div class='brick'></div>";
+                else if(world[i][j] == 2)
+                    output += "<div class='dot'></div>";
+                else if(world[i][j] == 0)
+                    output += "<div class='empty'></div>";
+            }
+            output += "\n</div>\n"
+        }
+        document.getElementById('world').innerHTML = output;
+    }
+
+    function displayPacman(){
+        document.getElementById('pacman').style.top = pacman.y*20+"px";
+        document.getElementById('pacman').style.left = pacman.x*20+"px";
+    }
+    displayWorld();
+    displayPacman();
+
+    document.onkeydown = function(e){
+        if(e.keyCode == 37 && world[pacman.y][pacman.x-1] !=1){
+            pacman.x--;
+        }
+        else if(e.keyCode == 39 && world[pacman.y][pacman.x+1] !=1){
+            pacman.x++;
+        }
+        else if(e.keyCode == 38 && world[pacman.y-1][pacman.x] !=1){
+            console.log(e.keyCode);
+            pacman.y--;
+        }
+        else if(e.keyCode == 40 && world[pacman.y+1][pacman.x] !=1){
+            pacman.y++;
+        }
+        if(world[pacman.y][pacman.x] == 2){
+            world[pacman.y][pacman.x] = 0;
+            displayWorld();
+        }
+        displayPacman();
+    }
+    </script>
+</body>
+</html>
